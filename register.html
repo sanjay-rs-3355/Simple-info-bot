@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* ===== Animated Gradient Background ===== */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+
+  background: linear-gradient(-45deg, #141e30, #243b55, #0f2027, #2c5364);
+  background-size: 400% 400%;
+  animation: gradientMove 14s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating Glow Blobs */
+body::before,
+body::after {
+  content: "";
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
+  animation: float 10s ease-in-out infinite;
+}
+
+body::before {
+  top: -120px;
+  left: -100px;
+}
+
+body::after {
+  bottom: -120px;
+  right: -100px;
+  animation-delay: 5s;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(25px); }
+}
+
+/* ===== Glass Container ===== */
+.container {
+  width: 360px;
+  padding: 45px 40px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  text-align: center;
+  color: white;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  margin-bottom: 30px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* ===== Inputs ===== */
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s ease;
+}
+
+input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+input:focus {
+  background: rgba(255,255,255,0.25);
+  box-shadow: 0 0 15px rgba(33,150,243,0.6);
+  transform: scale(1.03);
+}
+
+/* ===== Button ===== */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #2196f3, #1e88e5);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover glow */
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(33,150,243,0.8);
+}
+
+/* Ripple effect */
+button::after {
+  content: "";
+  position: absolute;
+  width: 300%;
+  height: 300%;
+  top: 50%;
+  left: 50%;
+  background: rgba(255,255,255,0.15);
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  transition: transform 0.6s ease;
+}
+
+button:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Create Account</h2>
+
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="register()">Register</button>
+</div>
+
+<script>
+function register(){
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+
+    localStorage.setItem("username", user);
+    localStorage.setItem("password", pass);
+
+    alert("Registered Successfully!");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

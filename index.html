@@ -5,327 +5,448 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Voice Wiki Chatbot</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #121212;
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    margin: 0;
-  }
-  #chatbox {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    border: 1px solid #444;
-    margin: 1rem;
-    background: #222;
-    border-radius: 8px;
-    scroll-behavior: smooth;
-  }
-  p {
-    margin: 0.3rem 0;
-    line-height: 1.4;
-    word-break: break-word;
-  }
-  .user-msg {
-    color: #fff;
-  }
-  .ai-msg {
-    color: #4caf50;
-    white-space: pre-wrap;
-  }
-  .timestamp {
-    font-size: 0.7rem;
-    color: #888;
-    margin-left: 0.3rem;
-  }
-  #input-area {
-    display: flex;
-    margin: 0 1rem 1rem;
-  }
-  #userInput {
-    flex: 1;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border-radius: 4px 0 0 4px;
-    border: 1px solid #444;
-    background: #333;
-    color: #eee;
-  }
-  #userInput:focus {
-    outline: 2px solid #4caf50;
-  }
-  button {
-    border: none;
-    color: white;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #sendBtn {
-    background: #4caf50;
-    padding: 0 1rem;
-    border-radius: 0 4px 4px 0;
-  }
-  #sendBtn:hover:not(:disabled) {
-    background: #45a049;
-  }
-  #sendBtn:disabled {
-    background: #2e7d32;
-    cursor: not-allowed;
-  }
-  #micBtn {
-    margin-left: 0.5rem;
-    background: #2196f3;
-    border-radius: 4px;
-    padding: 0 0.75rem;
-  }
-  #micBtn:hover:not(:disabled) {
-    background: #1976d2;
-  }
-  #micBtn:disabled {
-    background: #1565c0;
-    cursor: not-allowed;
-  }
-  @media (max-width: 480px) {
-    #input-area {
-      flex-direction: column;
-    }
-    #userInput {
-      border-radius: 4px 4px 0 0;
-      margin-bottom: 0.5rem;
-    }
-    #sendBtn, #micBtn {
-      border-radius: 0 0 4px 4px;
-      width: 100%;
-      padding: 0.75rem 0;
-      margin: 0.2rem 0 0 0;
-    }
-    #micBtn {
-      margin-left: 0;
-    }
-  }
-  #loadingIndicator {
-    font-size: 0.9rem;
-    color: #888;
-    margin-left: 0.5rem;
-    user-select: none;
-  }
-</style>
-</head>
-<body>
-  <main id="chatbox" role="log" aria-live="polite" aria-relevant="additions"></main>
 
-  <div id="input-area">
-    <input type="text" id="userInput" placeholder="Type your question here..." aria-label="Type your question here" autocomplete="off" />
-    <button id="sendBtn" aria-label="Send question">Send</button>
-    <button id="micBtn" title="Speak your question" aria-label="Speak your question">🎤</button>
-    <div id="loadingIndicator" aria-live="assertive" role="status" hidden>Loading...</div>
+/* ===== BASE LAYOUT ===== */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c1c3c);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== HEADER ===== */
+header {
+  height: 70px;
+  width: 96.7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  animation: slideDown 0.8s ease forwards;
+}
+
+#welcomeUser {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+header div:last-child {
+  display: flex;
+  gap: 10px;
+}
+
+header button {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+header button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* ===== CHAT AREA ===== */
+#chatbox {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+/* ===== MESSAGE BUBBLES ===== */
+.user-msg,
+.ai-msg {
+  padding: 14px 20px;
+  border-radius: 20px;
+  max-width: 70%;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.user-msg {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  animation: slideRight 0.3s ease;
+}
+
+.ai-msg {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.1);
+  animation: slideLeft 0.3s ease;
+}
+
+.timestamp {
+  display: block;
+  font-size: 10px;
+  margin-top: 6px;
+  opacity: 0.6;
+}
+
+/* ===== INPUT AREA ===== */
+#input-area {
+  padding: 18px 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+#userInput {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  transition: 0.3s;
+}
+
+#userInput:focus {
+  box-shadow: 0 0 15px rgba(67,206,162,0.5);
+}
+
+#sendBtn, #micBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.3s;
+}
+
+#sendBtn {
+  background: linear-gradient(45deg, #43cea2, #185a9d);
+}
+
+#sendBtn:hover {
+  transform: scale(1.1);
+}
+
+#micBtn {
+  background: linear-gradient(45deg, #2196f3, #1e88e5);
+}
+
+#micBtn:hover {
+  transform: scale(1.1);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Floating glow circles */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
+  animation: floatMove 12s ease-in-out infinite;
+  z-index: -1;
+}
+
+body::before { top: -100px; left: -100px; }
+body::after { bottom: -100px; right: -100px; animation-delay: 6s; }
+
+@keyframes floatMove {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(40px) rotate(10deg); }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN PROTECTION -->
+<script>
+if(localStorage.getItem("loggedIn") !== "true"){
+    window.location.href = "login.html";
+}
+</script>
+
+<header>
+  <div id="welcomeUser"></div>
+  <div>
+    <button onclick="clearChat()">Clear</button>
+    <button id="voiceToggle" onclick="toggleVoice()">🔊</button>
+    <button onclick="logout()">Logout</button>
   </div>
+</header>
+
+<main id="chatbox"></main>
+
+<div id="input-area">
+  <input type="text" id="userInput" placeholder="Ask something..." />
+  <button id="sendBtn">Send</button>
+  <input type="file" id="fileInput" accept="image/*,.pdf" hidden>
+  <button onclick="document.getElementById('fileInput').click()">📎</button>
+  <button id="micBtn">🎤</button>
+
+</div>
 
 <script>
-  // Speech synthesis voice selection and load
-  window.selectedVoice = null;
-  function loadVoices() {
-    const voices = speechSynthesis.getVoices();
-    window.selectedVoice =
-      voices.find(v => v.name.includes("Google US English")) ||
-      voices.find(v => v.name.includes("Microsoft Aria")) ||
-      voices.find(v => v.name.includes("Samantha")) ||
-      voices.find(v => v.lang === "en-US" && v.localService) ||
-      voices[0] || null;
-  }
-  if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = loadVoices;
-  }
-  loadVoices();
+  document.getElementById("fileInput").addEventListener("change", function(e){
 
-  // DOM elements references
-  const userInput = document.getElementById("userInput");
-  const sendBtn = document.getElementById("sendBtn");
-  const micBtn = document.getElementById("micBtn");
-  const chatbox = document.getElementById("chatbox");
-  const loadingIndicator = document.getElementById("loadingIndicator");
+    const file = e.target.files[0];
+    if(!file) return;
 
-  // Helper: format timestamp HH:MM
-  function getTimestamp() {
-    const d = new Date();
-    return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  }
+    appendMessage("📎 Uploaded: " + file.name, "user");
 
-  // Append a chat message with timestamp
-  function appendMessage(text, from = 'ai') {
-    const p = document.createElement('p');
-    const spanTimestamp = document.createElement('span');
-    spanTimestamp.className = 'timestamp';
-    spanTimestamp.textContent = getTimestamp();
-
-    if (from === 'user') {
-      p.textContent = "🧑 " + text;
-      p.className = 'user-msg';
-      p.appendChild(spanTimestamp);
-    } else if (from === 'ai') {
-      p.className = 'ai-msg';
-      p.textContent = "🤖 " + text;
-      p.appendChild(spanTimestamp);
+    if(file.type.startsWith("image/")){
+        const reader = new FileReader();
+        reader.onload = function(event){
+            const img = document.createElement("img");
+            img.src = event.target.result;
+            img.style.maxWidth = "200px";
+            img.style.borderRadius = "12px";
+            img.style.marginTop = "8px";
+            chatbox.appendChild(img);
+        };
+        reader.readAsDataURL(file);
     }
-    chatbox.appendChild(p);
-    chatbox.scrollTop = chatbox.scrollHeight;  // scroll smoothly
-    return p;
-  }
 
-  // Typewriter effect for AI reply
-  function typeReply(text, element, delay = 30) {
-    element.textContent = "🤖 ";
-    let i = 0;
-    return new Promise((resolve) => {
-      const interval = setInterval(() => {
-        if (i < text.length) {
-          element.textContent += text.charAt(i++);
-          chatbox.scrollTop = chatbox.scrollHeight;
-        } else {
-          clearInterval(interval);
-          resolve();
-        }
-      }, delay);
-    });
-  }
-
-  // Speak text with variability
-  function speak(text) {
-    if (!window.speechSynthesis) {
-      alert("Sorry, your browser does not support speech synthesis.");
-      return;
+    if(file.type === "application/pdf"){
+        appendMessage("PDF uploaded. (Preview feature can be added with backend)", "ai");
     }
-    window.speechSynthesis.cancel(); // cancel any ongoing speech
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.voice = window.selectedVoice || null;
-    utter.volume = 1;
-    utter.rate = 0.9 + Math.random() * 0.3;  // 0.9-1.2
-    utter.pitch = 0.9 + Math.random() * 0.3; // 0.9-1.2
-    utter.lang = "en-US";
-    window.speechSynthesis.speak(utter);
-  }
+});
 
-  // Fetch Wikipedia summary
-  async function fetchWikiSummary(query) {
-    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("No Wikipedia article found");
-    const data = await response.json();
-    return data.extract || "No summary available.";
-  }
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const micBtn = document.getElementById("micBtn");
+const chatbox = document.getElementById("chatbox");
+let voiceEnabled = true;
 
-  // Disable input and buttons while busy
-  function setLoading(isLoading) {
-    if (isLoading) {
-      sendBtn.disabled = true;
-      micBtn.disabled = true;
-      userInput.disabled = true;
-      loadingIndicator.hidden = false;
+function toggleVoice(){
+    voiceEnabled = !voiceEnabled;
+    localStorage.setItem("voiceEnabled", voiceEnabled);
+
+    const btn = document.getElementById("voiceToggle");
+
+    if(voiceEnabled){
+        btn.textContent = "🔊";
     } else {
-      sendBtn.disabled = false;
-      micBtn.disabled = false;
-      userInput.disabled = false;
-      loadingIndicator.hidden = true;
-      userInput.focus();
+        btn.textContent = "🔇";
+        speechSynthesis.cancel(); // stop speaking immediately
     }
-  }
+}
 
-  // Debounce to prevent multiple rapid requests
-  let debounceTimeout;
-  async function handleQuery() {
-    if (debounceTimeout) return;
-    debounceTimeout = setTimeout(() => {
-      debounceTimeout = null;
-    }, 1000);
+function logout(){
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+}
 
-    const input = userInput.value.trim();
-    if (!input) return;
+function clearChat(){
+    const username = localStorage.getItem("username") || "guest";
+    localStorage.removeItem("chat_" + username);
+    chatbox.innerHTML = "";
+}
 
-    setLoading(true);
+function getTimestamp(){
+  const d = new Date();
+  return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
 
-    appendMessage(input, 'user');
+function appendMessage(text, from='ai', save=true){
+    const username = localStorage.getItem("username") || "guest";
 
-    const aiMsgElem = document.createElement("p");
-    aiMsgElem.classList.add("ai-msg");
-    aiMsgElem.textContent = "🤖 ";
-    chatbox.appendChild(aiMsgElem);
+    const p = document.createElement("p");
+    const time = document.createElement("span");
+    time.className = "timestamp";
+    time.textContent = getTimestamp();
+
+    p.textContent = (from === "user" ? "🧑 " : "🤖 ") + text;
+    p.className = from === "user" ? "user-msg" : "ai-msg";
+
+    p.appendChild(time);
+    chatbox.appendChild(p);
     chatbox.scrollTop = chatbox.scrollHeight;
 
-    try {
-      const summary = await fetchWikiSummary(input);
-      await typeReply(summary, aiMsgElem);
-      speak(summary);
-    } catch (error) {
-      const errorMsg = "Sorry, I couldn't find info on that.";
-      aiMsgElem.textContent += errorMsg;
-      speak(errorMsg);
-    } finally {
-      setLoading(false);
+    if(save){
+        let chats = JSON.parse(localStorage.getItem("chat_" + username)) || [];
+        chats.push({text, from, time: time.textContent});
+        localStorage.setItem("chat_" + username, JSON.stringify(chats));
+    }
+}
+
+function loadChatHistory(){
+    const username = localStorage.getItem("username") || "guest";
+    let chats = JSON.parse(localStorage.getItem("chat_" + username)) || [];
+
+    chats.forEach(chat=>{
+        appendMessage(chat.text, chat.from, false);
+    });
+}
+function cleanQuery(query){
+    return query
+        .replace(/tell me about/gi, "")
+        .replace(/who is/gi, "")
+        .replace(/about/gi, "")
+        .trim();
+}
+
+async function fetchWiki(query) {
+
+    query = cleanQuery(query);
+
+    // STEP 1: OpenSearch for best suggestions
+    const openUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=5&namespace=0&format=json&origin=*`;
+
+    const openResponse = await fetch(openUrl);
+    const openData = await openResponse.json();
+
+    if (!openData[1].length) {
+        throw new Error("No results found");
     }
 
+    // STEP 2: Try first 5 titles and skip disambiguation
+    for (let title of openData[1]) {
+
+        const extractUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=true&explaintext=true&pithumbsize=400&titles=${encodeURIComponent(title)}&format=json&origin=*`;
+
+        const extractResponse = await fetch(extractUrl);
+        const extractData = await extractResponse.json();
+
+        const page = Object.values(extractData.query.pages)[0];
+
+        if (
+            page.extract &&
+            !page.extract.toLowerCase().includes("may refer to")
+        ) {
+            return {
+                text: page.extract,
+                image: page.thumbnail ? page.thumbnail.source : null,
+                link: `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`
+            };
+        }
+    }
+
+    throw new Error("No proper page found");
+}
+
+
+
+async function handleQuery(){
+
+    const input = userInput.value.trim();
+    if(!input) return;
+
+    appendMessage(input, "user");
     userInput.value = "";
-  }
 
-  // Event listeners
-  userInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleQuery();
+    try{
+
+        const result = await fetchWiki(input);
+
+        appendMessage(result.text, "ai");
+
+        if(result.image){
+            const img = document.createElement("img");
+            img.src = result.image;
+            img.style.maxWidth = "250px";
+            img.style.borderRadius = "12px";
+            img.style.marginTop = "10px";
+            chatbox.appendChild(img);
+        }
+
+        const link = document.createElement("a");
+        link.href = result.link;
+        link.target = "_blank";
+        link.innerText = "🔗 Read more on Wikipedia";
+        link.style.display = "block";
+        link.style.marginTop = "6px";
+        link.style.color = "#4caf50";
+        chatbox.appendChild(link);
+
+        speak(result.text);
+
+    } catch (error){
+
+        console.error(error);
+        appendMessage("No proper information found.", "ai");
+
     }
-  });
+}
 
-  sendBtn.addEventListener("click", () => handleQuery());
+function speak(text){
+    if(!voiceEnabled) return;
 
-  micBtn.addEventListener("click", () => startListening());
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    speechSynthesis.speak(utter);
+}
 
-  // Speech recognition start & handling
-  function startListening() {
+
+sendBtn.onclick = handleQuery;
+
+userInput.addEventListener("keydown", e=>{
+    if(e.key === "Enter") handleQuery();
+});
+
+micBtn.onclick = ()=>{
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Sorry, your browser does not support voice input.");
-      return;
+    if(!SpeechRecognition){
+        alert("Voice not supported");
+        return;
     }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-      userInput.value = "";
-      userInput.placeholder = "Listening...";
+    const recog = new SpeechRecognition();
+    recog.lang="en-US";
+    recog.onresult = e=>{
+        userInput.value = e.results[0][0].transcript;
+        handleQuery();
     };
+    recog.start();
+};
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      userInput.value = transcript;
-      userInput.placeholder = "Type your question here...";
-      handleQuery();
-    };
+window.onload = ()=>{
+    const username = localStorage.getItem("username") || "User";
+    document.getElementById("welcomeUser").innerText = "Welcome, " + username;
+    voiceEnabled = localStorage.getItem("voiceEnabled") !== "false";
+    document.getElementById("voiceToggle").textContent = voiceEnabled ? "🔊" : "🔇";
 
-    recognition.onerror = (event) => {
-      userInput.placeholder = "Type your question here...";
-      alert("Mic error: " + event.error);
-    };
-
-    recognition.onend = () => {
-      userInput.placeholder = "Type your question here...";
-    };
-
-    recognition.start();
-  }
-
-  // Focus input on load
-  window.addEventListener('load', () => {
-    userInput.focus();
-  });
+    loadChatHistory();
+};
 </script>
+
 </body>
 </html>
